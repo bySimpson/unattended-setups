@@ -1,5 +1,5 @@
 # unattended-setups
-A set of unattended setup tools for Debian-based Distros.
+A set of unattended setup scripts for Debian-based Distros. With only one command the specified tool will be installed and configured!
 
 ## Supported tools
 | Tool    | Command                                                       |
