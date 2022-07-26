@@ -1,0 +1,1 @@
+sh -c "$(curl -fsSL https://get.docker.com)"
