@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 sudo apt update && sudo apt install zsh git wget -y
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 cd ~/.oh-my-zsh/custom/plugins && git clone https://github.com/zsh-users/zsh-syntax-highlighting && cd ~
