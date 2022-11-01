@@ -10,21 +10,18 @@ pub struct SetupManager {
 }
 
 impl SetupManager {
-    pub fn new(git_url: String) -> SetupManager {
+    pub fn new(api_url: String) -> SetupManager {
         let client = Client::new();
         SetupManager {
-            client: client,
-            api_url: git_url,
+            client,
+            api_url,
             setups: None,
         }
     }
 
     fn update_setups(&mut self) {
-        match self.get_latest_setups() {
-            Ok(setups) => {
-                self.setups = Some(setups);
-            }
-            _ => (),
+        if let Ok(setups) = self.get_latest_setups() {
+            self.setups = Some(setups);
         };
     }
 
