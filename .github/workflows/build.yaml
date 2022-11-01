@@ -10,7 +10,7 @@ name: build & publish
 
 jobs:
   build:
-    name: build Linux x86_64
+    name: build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -30,18 +30,20 @@ jobs:
           target: armv7-unknown-linux-gnueabi
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        name: setup rust
-        with:
-          toolchain: stable
-          override: true
-      - name: Setup Cross
+        name: Check out git
+      - name: Set up Cross
         if: matrix.target != ''
         run: |
           echo "TARGET_FLAGS=--target ${{ matrix.target }}" >> $GITHUB_ENV
           echo "TARGET_DIR=./target/${{ matrix.target }}" >> $GITHUB_ENV
-      - uses: actions-rs/cargo@v1
-        name: build
+      - uses: actions-rs/toolchain@v1
+        name: Set up rust
         with:
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        name: Rust build
+        with:
+          use-cross: true
           command: build
           args: -r
