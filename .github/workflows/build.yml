@@ -74,7 +74,7 @@ jobs:
     - uses: actions/download-artifact@v3
       name: download artifacts
     - name: Display artifacts
-      run: ls -R >
+      run: ls -R
     - uses: marvinpinto/action-automatic-releases@latest
       name: publish prerelease
       with:
