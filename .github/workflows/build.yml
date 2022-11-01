@@ -57,10 +57,10 @@ jobs:
         run: |
           cross build -r --workspace ${{ env.TARGET_FLAGS }}
       - name: Strip release binary (x86)
-        if: contains(matrix.target, 'linux') && !contains(matrix.build, 'arm') && matrix.strip != ''
+        if: contains(matrix.target, 'linux') && !contains(matrix.build, 'arm')
         run: strip "target/${{ matrix.target }}/release/unattended-setups"
       - name: Strip release binary (arm)
-        if: contains(matrix.target, 'linux') && contains(matrix.build, 'arm')
+        if: contains(matrix.target, 'linux') && contains(matrix.build, 'arm') && matrix.strip != ''
         run: |
           docker run --rm -v \
             "$PWD/target:/target:Z" \
