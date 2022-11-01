@@ -34,7 +34,8 @@ jobs:
       - name: Install dependencies
         if: contains(matrix.target, 'linux') 
         run: |
-          sudo apt-get install libssl-dev
+          sudo dpkg --add-architecture armhf
+          sudo apt-get install -y pkg-config libssl-dev libssl-dev:armhf
       - name: Set up Cross
         if: matrix.target != ''
         run: |
