@@ -65,7 +65,7 @@ jobs:
           retention-days: 7
   release-deploy:
     name: deploy release
-    depends_on: build
+    needs: build
     steps:
     - uses: actions/download-artifact@v3
       name: download artifacts
