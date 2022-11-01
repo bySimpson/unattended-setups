@@ -76,8 +76,10 @@ jobs:
       run: ls -R ~/artifacts
     - uses: marvinpinto/action-automatic-releases@latest
       name: publish prerelease
-      repo_token: ${{ secrets.GITHUB_TOKEN }}
-      automatic_release_tag: "latest"
-      prerelease: true
-      title: "${GITHUB_REF##*/}"
-      files: ~/artifacts/*/*
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "${GITHUB_REF##*/}"
+        files: |
+          ~/artifacts/*/*
