@@ -71,6 +71,6 @@ jobs:
     - uses: actions/download-artifact@v3
       name: download artifacts
       with:
-        path: /artifacts
+        path: ~/artifacts
     - name: Display artifacts
-      run: ls -R /artifacts
+      run: ls -R ~/artifacts
