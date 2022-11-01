@@ -43,10 +43,11 @@ jobs:
           echo "CARGO=cross" >> $GITHUB_ENV
           echo "TARGET_FLAGS=--target ${{ matrix.target }}" >> $GITHUB_ENV
           echo "TARGET_DIR=./target/${{ matrix.target }}" >> $GITHUB_ENV
+          echo "OPENSSL_DIR"=/usr/local/ssl >> $GITHUB_ENV
       - name: Cargo build
         run: |
           cross build -r --workspace ${{ env.TARGET_FLAGS }}
-      - name: Archive code coverage results
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: unattended-setups-{{ matrix.build }}
