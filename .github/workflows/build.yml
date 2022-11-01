@@ -55,7 +55,7 @@ jobs:
         run: |
           cross build -r --workspace ${{ env.TARGET_FLAGS }}
       - name: Strip release binary
-        if: contains(matrix.target, 'linux') 
+        if: contains(matrix.target, 'linux') && !contains(matrix.build, 'arm')
         run: strip "target/${{ matrix.target }}/release/unattended-setups"
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
