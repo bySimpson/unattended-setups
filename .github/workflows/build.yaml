@@ -19,7 +19,7 @@ jobs:
         - stable-arm64
         - stable-armv7
         include:
-        - build: stable
+        - build: stable-x86
           os: ubuntu-22.04
           target: x86_64-unknown-linux-gnu
         - build: stable-arm64
