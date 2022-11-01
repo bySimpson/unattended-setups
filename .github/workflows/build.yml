@@ -58,13 +58,13 @@ jobs:
         if: contains(matrix.target, 'linux') && !contains(matrix.build, 'arm')
         run: strip "target/${{ matrix.target }}/release/unattended-setups"
       - name: Strip release binary (arm)
-            if: contains(matrix.target, 'linux') && contains(matrix.build, 'arm')
-            run: |
-              docker run --rm -v \
-                "$PWD/target:/target:Z" \
-                rustembedded/cross:arm-unknown-linux-gnueabihf \
-                arm-linux-gnueabihf-strip \
-                /target/arm-unknown-linux-gnueabihf/release/unattended-setups
+        if: contains(matrix.target, 'linux') && contains(matrix.build, 'arm')
+        run: |
+          docker run --rm -v \
+            "$PWD/target:/target:Z" \
+            rustembedded/cross:arm-unknown-linux-gnueabihf \
+            arm-linux-gnueabihf-strip \
+            /target/arm-unknown-linux-gnueabihf/release/unattended-setups
       - name: Add files to archive
         run: | 
           tar -C ./target/${{ matrix.target }}/release -czvf unattended-setups-${{ matrix.target }}.tar.gz unattended-setups
