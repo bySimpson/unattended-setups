@@ -57,11 +57,14 @@ jobs:
       - name: Strip release binary
         if: contains(matrix.target, 'linux') && !contains(matrix.build, 'arm')
         run: strip "target/${{ matrix.target }}/release/unattended-setups"
+      - name: Add files to archive
+        run: | 
+          tar -czvf unattended-setups-${{ matrix.target }}.tar.gz ./target/${{ matrix.target }}/release/unattended-setups
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: unattended-setups-${{ matrix.build }}
-          path: ./target/${{ matrix.target }}/release/unattended-setups
+          path: unattended-setups-${{ matrix.target }}.tar.gz
           retention-days: 7
   release-deploy:
     name: deploy release
@@ -70,16 +73,14 @@ jobs:
     steps:
     - uses: actions/download-artifact@v3
       name: download artifacts
-      with:
-        path: ~/artifacts
     - name: Display artifacts
-      run: ls -R ~/artifacts
+      run: ls -R
     - uses: marvinpinto/action-automatic-releases@latest
       name: publish prerelease
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         automatic_release_tag: "latest"
         prerelease: true
-        title: "${GITHUB_REF##*/}"
+        title: ${GITHUB_REF##*/}
         files: |
-          ~/artifacts/*/*
+          *.tar.gz
