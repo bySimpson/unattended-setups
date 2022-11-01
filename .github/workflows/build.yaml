@@ -50,6 +50,6 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: unattended-setups-{{ matrix.build }}
-          path: ./target/${{ matrix.target }}
-          retention-days: 90
+          name: unattended-setups-${{ matrix.build }}
+          path: ./target/${{ matrix.target }}/release/unattended-setups
+          retention-days: 7
