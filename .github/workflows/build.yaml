@@ -30,22 +30,20 @@ jobs:
       - name: Install dependencies
         if: contains(matrix.target, 'linux') 
         run: |
-          sudo apt-get install -y pkg-config libssl-dev
-      - name: Set up Cross
-        if: matrix.target != ''
-        run: |
-          echo "TARGET_FLAGS=--target ${{ matrix.target }}" >> $GITHUB_ENV
-          echo "TARGET_DIR=./target/${{ matrix.target }}" >> $GITHUB_ENV
+          sudo apt-get install -y pkg-config libssl-dev clang
       - uses: dtolnay/rust-toolchain@master
         name: Set up Rust
         with:
           toolchain: stable
-      - uses: actions-rs/cargo@v1
-        name: Cargo build
-        with:
-          use-cross: true
-          command: build
-          args: -r
+      - name: Set up Cross
+        if: matrix.target != ''
+        run: |
+          echo "CARGO=cross" >> $GITHUB_ENV
+          echo "TARGET_FLAGS=--target ${{ matrix.target }}" >> $GITHUB_ENV
+          echo "TARGET_DIR=./target/${{ matrix.target }}" >> $GITHUB_ENV
+      - name: Cargo build
+        run: |
+          cross build -r --workspace ${{ env.TARGET_FLAGS }}
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
         with:
