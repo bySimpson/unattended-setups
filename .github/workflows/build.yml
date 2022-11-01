@@ -54,9 +54,17 @@ jobs:
       - name: Cargo build
         run: |
           cross build -r --workspace ${{ env.TARGET_FLAGS }}
-      - name: Strip release binary
+      - name: Strip release binary (x86)
         if: contains(matrix.target, 'linux') && !contains(matrix.build, 'arm')
         run: strip "target/${{ matrix.target }}/release/unattended-setups"
+      - name: Strip release binary (arm)
+            if: contains(matrix.target, 'linux') && contains(matrix.build, 'arm')
+            run: |
+              docker run --rm -v \
+                "$PWD/target:/target:Z" \
+                rustembedded/cross:arm-unknown-linux-gnueabihf \
+                arm-linux-gnueabihf-strip \
+                /target/arm-unknown-linux-gnueabihf/release/unattended-setups
       - name: Add files to archive
         run: | 
           tar -C ./target/${{ matrix.target }}/release -czvf unattended-setups-${{ matrix.target }}.tar.gz unattended-setups
@@ -78,7 +86,7 @@ jobs:
     - uses: marvinpinto/action-automatic-releases@latest
       name: publish prerelease
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: "Development build: ${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
         title: ${{ github.head_ref || github.ref_name }} 
