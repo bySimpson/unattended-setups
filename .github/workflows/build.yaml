@@ -3,50 +3,45 @@ on:
     branches:
       - 'main'
       - 'develop'
+    tags:
+      - "v*.*"
 
 name: build & publish
 
 jobs:
-  build-linux_arm7:
-    name: Linux ARMv7
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: armv7-unknown-linux-gnueabihf
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --target armv7-unknown-linux-gnueabihf
-  build-linux_arm64:
-    name: Linux ARM64
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
+  build:
+    name: build Linux x86_64
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build:
+        - stable-x86
+        - stable-arm64
+        - stable-armv7
+        include:
+        - build: stable
+          os: ubuntu-22.04
+          target: x86_64-unknown-linux-gnu
+        - build: stable-arm64
+          os: ubuntu-22.04
           target: aarch64-unknown-linux-gnu
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --target aarch64-unknown-linux-gnu -r
-  build-x86_64:
-    name: Linux x86_64
-    runs-on: ubuntu-latest
+        - build: stable-armv7
+          os: ubuntu-22.04
+          target: armv7-unknown-linux-gnueabi
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
+        name: setup rust
         with:
           toolchain: stable
           override: true
+      - name: Setup Cross
+        if: matrix.target != ''
+        run: |
+          echo "TARGET_FLAGS=--target ${{ matrix.target }}" >> $GITHUB_ENV
+          echo "TARGET_DIR=./target/${{ matrix.target }}" >> $GITHUB_ENV
       - uses: actions-rs/cargo@v1
+        name: build
         with:
           command: build
           args: -r
