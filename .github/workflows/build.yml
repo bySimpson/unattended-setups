@@ -88,9 +88,9 @@ jobs:
     - uses: marvinpinto/action-automatic-releases@latest
       name: publish prerelease
       with:
-        repo_token: "Development build: ${{ secrets.GITHUB_TOKEN }}"
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         automatic_release_tag: "latest"
         prerelease: true
-        title: ${{ github.head_ref || github.ref_name }} 
+        title: "Development build: ${{ github.head_ref || github.ref_name }}"
         files: |
           ./*/*.tar.gz
