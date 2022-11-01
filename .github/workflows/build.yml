@@ -66,6 +66,7 @@ jobs:
   release-deploy:
     name: deploy release
     needs: build
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/download-artifact@v3
       name: download artifacts
