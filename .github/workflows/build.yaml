@@ -17,7 +17,6 @@ jobs:
         build:
         - stable-x86_64
         - stable-arm64
-        - stable-armv7
         include:
         - build: stable-x86_64
           os: ubuntu-22.04
