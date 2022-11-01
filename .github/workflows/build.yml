@@ -66,7 +66,7 @@ jobs:
   release-deploy:
     name: deploy release
     depends_on: build
-    stages:
+    steps:
     - uses: actions/download-artifact@v3
       name: download artifacts
       with:
