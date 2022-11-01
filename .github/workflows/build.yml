@@ -54,6 +54,9 @@ jobs:
       - name: Cargo build
         run: |
           cross build -r --workspace ${{ env.TARGET_FLAGS }}
+      - name: Strip release binary
+        if: contains(matrix.target, 'linux') 
+        run: strip "target/${{ matrix.target }}/release/rg"
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
