@@ -63,3 +63,13 @@ jobs:
           name: unattended-setups-${{ matrix.build }}
           path: ./target/${{ matrix.target }}/release/unattended-setups
           retention-days: 7
+  release-deploy:
+    name: deploy release
+    depends_on: build
+    stages:
+    - uses: actions/download-artifact@v3
+      name: download artifacts
+      with:
+        path: /artifacts
+    - name: Display artifacts
+      run: ls -R /artifacts
