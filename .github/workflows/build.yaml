@@ -12,16 +12,23 @@ jobs:
   build:
     name: build
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     strategy:
       matrix:
         build:
+        - stable-i686
         - stable-x86_64
+        - stable-armv7
         - stable-arm64
         include:
+        - build: stable-i686
+          os: ubuntu-22.04
+          target: i686-unknown-linux-gnu
         - build: stable-x86_64
           os: ubuntu-22.04
           target: x86_64-unknown-linux-gnu
+        - build: stable-armv7
+          os: ubuntu-22.04
+          target: armv7-unknown-linux-gnueabi
         - build: stable-arm64
           os: ubuntu-22.04
           target: aarch64-unknown-linux-gnu
