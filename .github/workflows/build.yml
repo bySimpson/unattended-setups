@@ -59,7 +59,7 @@ jobs:
         run: strip "target/${{ matrix.target }}/release/unattended-setups"
       - name: Add files to archive
         run: | 
-          cd ./target/${{ matrix.target }}/release && tar -czvf unattended-setups-${{ matrix.target }}.tar.gz unattended-setups
+          tar -C ./target/${{ matrix.target }}/release -czvf unattended-setups-${{ matrix.target }}.tar.gz unattended-setups
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
