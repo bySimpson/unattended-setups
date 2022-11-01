@@ -64,7 +64,7 @@ jobs:
         run: |
           docker run --rm -v \
             "$PWD/target:/target:Z" \
-            rustembedded/cross:{{ matrix.target }} \
+            rustembedded/cross:${{ matrix.target }} \
             ${{ matrix.strip }} \
             /target/${{ matrix.target }}/release/unattended-setups
       - name: Add files to archive
