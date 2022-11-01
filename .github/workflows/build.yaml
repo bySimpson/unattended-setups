@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v2
         name: Check out git
       - name: Install dependencies
-        if: contains(matrix.target, "linux") 
+        if: contains(matrix.target, 'linux') 
         run: |
           sudo apt-get install libssl-dev
       - name: Set up Cross
