@@ -29,9 +29,11 @@ jobs:
         - build: stable-armv7
           os: ubuntu-22.04
           target: armv7-unknown-linux-gnueabi
+          strip: arm-linux-gnueabihf-strip
         - build: stable-arm64
           os: ubuntu-22.04
           target: aarch64-unknown-linux-gnu
+          strip: aarch64-linux-gnu-strip
     steps:
       - uses: actions/checkout@v3
         name: Check out git
@@ -55,15 +57,15 @@ jobs:
         run: |
           cross build -r --workspace ${{ env.TARGET_FLAGS }}
       - name: Strip release binary (x86)
-        if: contains(matrix.target, 'linux') && !contains(matrix.build, 'arm')
+        if: contains(matrix.target, 'linux') && !contains(matrix.build, 'arm') && matrix.strip != ''
         run: strip "target/${{ matrix.target }}/release/unattended-setups"
       - name: Strip release binary (arm)
         if: contains(matrix.target, 'linux') && contains(matrix.build, 'arm')
         run: |
           docker run --rm -v \
             "$PWD/target:/target:Z" \
-            rustembedded/cross:arm-unknown-linux-gnueabihf \
-            arm-linux-gnueabihf-strip \
+            rustembedded/cross:{{ matrix.target }} \
+            ${{ matrix.strip }} \
             /target/${{ matrix.target }}/release/unattended-setups
       - name: Add files to archive
         run: | 
