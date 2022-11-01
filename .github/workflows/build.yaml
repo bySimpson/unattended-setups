@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         build:
-        - stable-x86
+        - stable-x86_64
         - stable-arm64
         - stable-armv7
         include:
