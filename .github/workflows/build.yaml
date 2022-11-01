@@ -25,9 +25,6 @@ jobs:
         - build: stable-arm64
           os: ubuntu-22.04
           target: aarch64-unknown-linux-gnu
-        - build: stable-armv7
-          os: ubuntu-22.04
-          target: armv7-unknown-linux-gnueabi
     steps:
       - uses: actions/checkout@v2
         name: Check out git
@@ -35,12 +32,6 @@ jobs:
         if: contains(matrix.target, 'linux') 
         run: |
           sudo apt-get install -y pkg-config libssl-dev
-      - name: Install armv7 dependencies
-        if: matrix.build == 'stable-armv7'
-        run: |
-          sudo dpkg --add-architecture armhf
-          sudo apt-get update
-          sudo apt-get install libssl-dev:armhf
       - name: Set up Cross
         if: matrix.target != ''
         run: |
