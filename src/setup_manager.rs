@@ -1,12 +1,12 @@
-use crate::setup::{Setups};
+use crate::setup::Setups;
+use reqwest::blocking::Client;
+use reqwest::header::USER_AGENT;
 use reqwest::Error;
-use reqwest::blocking::{Client};
-use reqwest::header::{USER_AGENT};
 
 pub struct SetupManager {
     client: Client,
     api_url: String,
-    setups: Option<Setups>
+    setups: Option<Setups>,
 }
 
 impl SetupManager {
@@ -15,7 +15,7 @@ impl SetupManager {
         SetupManager {
             client: client,
             api_url: git_url,
-            setups: None
+            setups: None,
         }
     }
 
@@ -23,8 +23,8 @@ impl SetupManager {
         match self.get_latest_setups() {
             Ok(setups) => {
                 self.setups = Some(setups);
-            },
-            _ => ()
+            }
+            _ => (),
         };
     }
 
