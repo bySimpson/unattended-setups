@@ -24,7 +24,7 @@ impl UserInterface {
         let mut manager = SetupManager::new(String::from("https://unattended-setups.thmr.at"));
         manager.update_setups();
         Self {
-            titles: vec![],
+            titles: vec![String::from("install")],
             index: 0,
             manager,
         }
@@ -64,13 +64,13 @@ fn ui<B: Backend>(f: &mut Frame<B>, interface: &mut UserInterface) {
         .map(|t| Spans::from(Span::styled(t, Style::default())))
         .collect();
     let tabs = Tabs::new(titles)
-        .block(Block::default().borders(Borders::ALL).title("Tabs"))
+        .block(Block::default().borders(Borders::ALL).title("Commands"))
         .select(interface.index)
         .style(Style::default().fg(Color::Cyan))
         .highlight_style(
             Style::default()
                 .add_modifier(Modifier::BOLD)
-                .bg(Color::Black),
+                .fg(Color::Cyan),
         );
     f.render_widget(tabs, chunks[0]);
 
@@ -82,9 +82,13 @@ fn ui<B: Backend>(f: &mut Frame<B>, interface: &mut UserInterface) {
         .map(|c_script| ListItem::new(c_script.name.to_owned()))
         .collect();
     let setups_list = List::new(setups)
-        .block(Block::default().borders(Borders::ALL).title("List"))
+        .block(Block::default().borders(Borders::ALL).title("Setups"))
         .style(Style::default())
         .start_corner(Corner::TopLeft)
-        .highlight_style(Style::default().add_modifier(Modifier::BOLD));
+        .highlight_style(
+            Style::default()
+                .add_modifier(Modifier::BOLD)
+                .fg(Color::Cyan),
+        );
     f.render_stateful_widget(setups_list, chunks[1], &mut interface.manager.state);
 }
