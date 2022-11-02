@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Setups {
-    scripts: Vec<Setup>,
+    pub scripts: Vec<Setup>,
 }
 
 impl Setups {
@@ -13,6 +13,6 @@ impl Setups {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Setup {
-    name: String,
-    path: String,
+    pub name: String,
+    pub path: String,
 }
