@@ -21,10 +21,12 @@ pub struct UserInterface {
 
 impl UserInterface {
     pub fn new() -> Self {
+        let mut manager = SetupManager::new(String::from("https://unattended-setups.thmr.at"));
+        manager.update_setups();
         Self {
             titles: vec![],
             index: 0,
-            manager: SetupManager::new(String::from("https://unattended-setups.thmr.at")),
+            manager,
         }
     }
 }
@@ -39,6 +41,9 @@ pub fn run_app<B: Backend>(
         if let Event::Key(key) = event::read()? {
             match key.code {
                 KeyCode::Char('q') => return Ok(()),
+                KeyCode::Down => interface.manager.next_item(),
+                KeyCode::Up => interface.manager.previous_item(),
+                KeyCode::Char('u') => interface.manager.update_setups(),
                 _ => {}
             }
         }
@@ -79,6 +84,7 @@ fn ui<B: Backend>(f: &mut Frame<B>, interface: &mut UserInterface) {
     let setups_list = List::new(setups)
         .block(Block::default().borders(Borders::ALL).title("List"))
         .style(Style::default())
-        .start_corner(Corner::TopLeft);
-    f.render_widget(setups_list, chunks[1]);
+        .start_corner(Corner::TopLeft)
+        .highlight_style(Style::default().add_modifier(Modifier::BOLD));
+    f.render_stateful_widget(setups_list, chunks[1], &mut interface.manager.state);
 }

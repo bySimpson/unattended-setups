@@ -2,11 +2,13 @@ use crate::setup::Setups;
 use reqwest::blocking::Client;
 use reqwest::header::USER_AGENT;
 use reqwest::Error;
+use tui::widgets::ListState;
 
 pub struct SetupManager {
     client: Client,
     api_url: String,
     setups: Option<Setups>,
+    pub state: ListState,
 }
 
 impl SetupManager {
@@ -16,10 +18,11 @@ impl SetupManager {
             client,
             api_url,
             setups: None,
+            state: ListState::default(),
         }
     }
 
-    fn update_setups(&mut self) {
+    pub fn update_setups(&mut self) {
         if let Ok(setups) = self.get_latest_setups() {
             self.setups = Some(setups);
         };
@@ -36,10 +39,37 @@ impl SetupManager {
     }
 
     pub fn get_setups(&mut self) -> Setups {
-        self.update_setups();
         match &self.setups {
             Some(setups) => setups.clone(),
             None => Setups::new(vec![]),
         }
+    }
+
+    pub fn next_item(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i >= self.get_setups().scripts.len() - 1 {
+                    0
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
+
+    pub fn previous_item(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    self.get_setups().scripts.len() - 1
+                } else {
+                    i - 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
     }
 }
