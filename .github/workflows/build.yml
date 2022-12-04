@@ -89,7 +89,7 @@ jobs:
       name: publish prerelease
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        automatic_release_tag: "latest"
+        automatic_release_tag: "${{ github.head_ref || github.ref_name }}"
         prerelease: true
         title: "Development build: ${{ github.head_ref || github.ref_name }}"
         files: |
