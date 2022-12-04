@@ -11,6 +11,7 @@ serde_json = { version = "1.0"}
 serde = { version = "1.0", features = ["derive"] }
 tui = {version = "0.19", features = ['crossterm', 'serde'] }
 crossterm = {version = "0.25", features = [ "serde" ] }
+crossbeam-channel = "0.5"
 
 
 [target.'cfg(unix)'.dependencies]

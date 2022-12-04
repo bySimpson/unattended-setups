@@ -1,12 +1,15 @@
-use std::io;
+use std::{io, process};
 
-use crossterm::{terminal::{enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode}, execute, event::{EnableMouseCapture, DisableMouseCapture}};
+use crossterm::{
+    event::{DisableMouseCapture, EnableMouseCapture},
+    execute,
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+};
 use tui::{backend::CrosstermBackend, Terminal};
 
 mod setup;
 mod setup_manager;
 mod user_interface;
-
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     enable_raw_mode()?;
@@ -28,6 +31,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Err(err) = res {
         println!("{:?}", err)
     }
-
-    Ok(())
+    process::exit(1);
+    //Ok(())
 }
