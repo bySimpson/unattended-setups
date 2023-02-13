@@ -8,7 +8,7 @@ use tui::{
     layout::{Constraint, Corner, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Span, Spans},
-    widgets::{Block, Borders, Clear, List, ListItem, Tabs},
+    widgets::{Block, Borders, Clear, List, ListItem, Tabs, Paragraph},
     Frame, Terminal,
 };
 
@@ -19,6 +19,7 @@ pub struct UserInterface {
     pub index: usize,
     manager: SetupManager,
     pub show_popup: bool,
+    pub popup_text: String,
 }
 
 impl UserInterface {
@@ -30,7 +31,22 @@ impl UserInterface {
             index: 0,
             manager,
             show_popup: false,
+            popup_text: String::from("")
         }
+    }
+
+    pub fn execute_current_setup(&mut self) {
+        let setups = self
+        .manager
+        .get_setups();
+        let current_script = setups
+        .scripts
+        .get(self.manager.state.selected().unwrap())
+        .unwrap();
+        let _ = current_script
+            .execute();
+        self.popup_text = format!("Successfully installed {}", current_script.name);
+        self.show_popup = true;
     }
 }
 
@@ -44,16 +60,22 @@ pub fn run_app<B: Backend>(
         terminal.draw(|f| ui(f, &mut interface))?;
 
         for event in event_receiver.try_iter() {
-            match event {
-                Event::Key(code) => match code.code {
-                    KeyCode::Char('q') => return Ok(()),
-                    KeyCode::Down => interface.manager.next_item(),
-                    KeyCode::Up => interface.manager.previous_item(),
-                    KeyCode::Char('u') => interface.manager.update_setups(),
-                    KeyCode::Char('p') => interface.show_popup = !interface.show_popup,
-                    _ => {}
-                },
-                _ => (),
+            if !interface.show_popup {
+                match event {
+                    Event::Key(code) => match code.code {
+                        KeyCode::Char('q') => return Ok(()),
+                        KeyCode::Down => interface.manager.next_item(),
+                        KeyCode::Up => interface.manager.previous_item(),
+                        KeyCode::Char('u') => interface.manager.update_setups(),
+                        //KeyCode::Char('p') => interface.show_popup = !interface.show_popup,
+                        KeyCode::Enter => interface.execute_current_setup(),
+                        _ => {}
+                    },
+                    _ => (),
+                }
+            }
+            else {
+                interface.show_popup = false;
             }
         }
     }
@@ -108,10 +130,13 @@ fn ui<B: Backend>(f: &mut Frame<B>, interface: &mut UserInterface) {
     f.render_stateful_widget(setups_list, chunks[1], &mut interface.manager.state);
 
     if interface.show_popup {
-        let block = Block::default().title("Popup").borders(Borders::ALL);
+        let block = Block::default().title("Status").borders(Borders::ALL);
+        let paragraph = Paragraph::new(interface.popup_text.clone())
+        .block(block);
         let area = centered_rect(60, 20, size);
+
         f.render_widget(Clear, area); //this clears out the background
-        f.render_widget(block, area);
+        f.render_widget(paragraph, area);
     }
 }
 
