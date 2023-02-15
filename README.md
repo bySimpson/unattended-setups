@@ -8,7 +8,7 @@ sh -c "$(curl -fsSL https://thmr.at/cli)"
 ```
 
 If you want to use a different release/branch, use the following command:
-```
+```sh
 sh -c "$(curl -fsSL https://thmr.at/cli/{BRANCH/RELEASE})"
 ```
 
