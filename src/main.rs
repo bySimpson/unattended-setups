@@ -18,7 +18,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
     enable_raw_mode()?;
-    let mut user_interface = user_interface::UserInterface::new();
+    let user_interface = user_interface::UserInterface::new();
     let res = user_interface::run_app(&mut terminal, user_interface);
     disable_raw_mode()?;
     execute!(
