@@ -25,6 +25,7 @@ impl SetupManager {
     pub fn update_setups(&mut self) {
         if let Ok(setups) = self.get_latest_setups() {
             self.setups = Some(setups);
+            self.state.select(Some(0))
         };
     }
 

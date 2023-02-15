@@ -1,6 +1,6 @@
 use std::io;
 
-use crossbeam_channel::{unbounded, Sender};
+use crossbeam_channel::{unbounded, Receiver, Sender};
 use crossterm::event::{self, Event, KeyCode};
 use std::thread;
 use tui::{
@@ -8,11 +8,16 @@ use tui::{
     layout::{Constraint, Corner, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Span, Spans},
-    widgets::{Block, Borders, Clear, List, ListItem, Tabs, Paragraph},
+    widgets::{Block, Borders, Clear, List, ListItem, Paragraph, Tabs},
     Frame, Terminal,
 };
 
 use crate::setup_manager::SetupManager;
+
+pub enum EventListenerState {
+    Listening,
+    Sleeping,
+}
 
 pub struct UserInterface {
     pub titles: Vec<String>,
@@ -31,22 +36,18 @@ impl UserInterface {
             index: 0,
             manager,
             show_popup: false,
-            popup_text: String::from("")
+            popup_text: String::from(""),
         }
     }
 
     pub fn execute_current_setup(&mut self) {
-        let setups = self
-        .manager
-        .get_setups();
+        let setups = self.manager.get_setups();
         let current_script = setups
-        .scripts
-        .get(self.manager.state.selected().unwrap())
-        .unwrap();
-        let _ = current_script
-            .execute();
-        self.popup_text = format!("Successfully installed {}", current_script.name);
-        self.show_popup = true;
+            .scripts
+            .get(self.manager.state.selected().unwrap())
+            .unwrap();
+        let _ = current_script.execute();
+        self.popup_text = format!("Successfully installed {}!", current_script.name);
     }
 }
 
@@ -55,7 +56,8 @@ pub fn run_app<B: Backend>(
     mut interface: UserInterface,
 ) -> io::Result<()> {
     let (event_sender, event_receiver) = unbounded::<Event>();
-    start_eventloop(event_sender);
+    let (event_listener_sender, event_listener_receiver) = unbounded::<EventListenerState>();
+    start_eventloop(event_sender, event_listener_receiver);
     loop {
         terminal.draw(|f| ui(f, &mut interface))?;
 
@@ -68,22 +70,37 @@ pub fn run_app<B: Backend>(
                         KeyCode::Up => interface.manager.previous_item(),
                         KeyCode::Char('u') => interface.manager.update_setups(),
                         //KeyCode::Char('p') => interface.show_popup = !interface.show_popup,
-                        KeyCode::Enter => interface.execute_current_setup(),
+                        KeyCode::Enter => {
+                            event_listener_sender.send(EventListenerState::Sleeping).unwrap();
+                            interface.execute_current_setup();
+                            event_listener_sender.send(EventListenerState::Listening).unwrap();
+                            interface.show_popup = true;
+                        }
                         _ => {}
                     },
                     _ => (),
                 }
-            }
-            else {
+            } else {
                 interface.show_popup = false;
             }
         }
     }
 }
 
-fn start_eventloop(event_sender: Sender<Event>) {
+fn start_eventloop(
+    event_sender: Sender<Event>,
+    event_listener_receiver: Receiver<EventListenerState>,
+) {
+    let mut current_state = EventListenerState::Listening;
     let _ = thread::spawn(move || loop {
-        event_sender.send(event::read().unwrap()).unwrap();
+        let evt = event::read().unwrap();
+        for c_lstnr_evt in event_listener_receiver.try_iter() {
+            current_state = c_lstnr_evt;
+        }
+        match current_state {
+            EventListenerState::Listening => event_sender.send(evt).unwrap(),
+            EventListenerState::Sleeping => {}
+        }
     });
 }
 
@@ -107,6 +124,7 @@ fn ui<B: Backend>(f: &mut Frame<B>, interface: &mut UserInterface) {
         .highlight_style(
             Style::default()
                 .add_modifier(Modifier::BOLD)
+                .add_modifier(Modifier::UNDERLINED)
                 .fg(Color::Cyan),
         );
     f.render_widget(tabs, chunks[0]);
@@ -126,13 +144,11 @@ fn ui<B: Backend>(f: &mut Frame<B>, interface: &mut UserInterface) {
             Style::default()
                 .add_modifier(Modifier::BOLD)
                 .fg(Color::Cyan),
-        );
+        ).highlight_symbol(">> ");
     f.render_stateful_widget(setups_list, chunks[1], &mut interface.manager.state);
-
     if interface.show_popup {
         let block = Block::default().title("Status").borders(Borders::ALL);
-        let paragraph = Paragraph::new(interface.popup_text.clone())
-        .block(block);
+        let paragraph = Paragraph::new(interface.popup_text.clone()).block(block);
         let area = centered_rect(60, 20, size);
 
         f.render_widget(Clear, area); //this clears out the background
