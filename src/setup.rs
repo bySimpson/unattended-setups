@@ -21,10 +21,9 @@ pub struct Setup {
 
 impl Setup {
     pub fn execute(&self) -> String {
-        let script = Client::new().get(format!("{}", &self.path)).send().expect("Could not download script!").text().expect("Did not receive message!");
         let output = Command::new("sh")
         .arg("-c")
-        .arg(script)
+        .arg(self.get_text())
         // Tell the OS to record the command's output
         .stdout(Stdio::piped())
         // execute the command, wait for it to complete, then capture the output
@@ -32,5 +31,9 @@ impl Setup {
         // Blow up if the OS was unable to start the program
         .unwrap();
         String::from_utf8(output.stdout).unwrap()
+    }
+
+    pub fn get_text(&self) -> String {
+        Client::new().get(format!("{}", &self.path)).send().expect("Could not download script!").text().expect("Did not receive message!")
     }
 }

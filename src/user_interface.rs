@@ -19,12 +19,28 @@ pub enum EventListenerState {
     Sleeping,
 }
 
+pub enum SelectedCommand {
+    Install = 0,
+    Show = 1,
+}
+
+impl SelectedCommand {
+    pub fn new(usize_command: usize) -> SelectedCommand {
+        match usize_command {
+            0 => SelectedCommand::Install,
+            1 => SelectedCommand::Show,
+            _ => panic!("Command currently not implemented!"),
+        }
+    }
+}
+
 pub struct UserInterface {
     pub titles: Vec<String>,
     pub index: usize,
     manager: SetupManager,
     pub show_popup: bool,
     pub popup_text: String,
+    pub popup_title: String,
 }
 
 impl UserInterface {
@@ -32,11 +48,30 @@ impl UserInterface {
         let mut manager = SetupManager::new(String::from("https://unattended-setups.thmr.at"));
         manager.update_setups();
         Self {
-            titles: vec![String::from("install")],
+            titles: vec![String::from("install"), String::from("show")],
             index: 0,
             manager,
             show_popup: false,
             popup_text: String::from(""),
+            popup_title: String::from("")
+        }
+    }
+
+    pub fn next_command(&mut self) {
+        let i = self.index;
+        if i >= self.titles.len() - 1 {
+            self.index = 0;
+        } else {
+            self.index = i + 1
+        }
+    }
+
+    pub fn previous_command(&mut self) {
+        let i = self.index;
+        if i == 0 {
+            self.index = self.titles.len() - 1
+        } else {
+            self.index = i - 1
         }
     }
 
@@ -48,6 +83,18 @@ impl UserInterface {
             .unwrap();
         let _ = current_script.execute();
         self.popup_text = format!("Successfully installed {}!", current_script.name);
+        self.popup_title = String::from("Status");
+    }
+
+    pub fn print_current_setup_string(&mut self) {
+        let setups = self.manager.get_setups();
+        let current_script = setups
+            .scripts
+            .get(self.manager.state.selected().unwrap())
+            .unwrap();
+        let output = current_script.get_text();
+        self.popup_text = output;
+        self.popup_title = format!("Script of {}", current_script.name);
     }
 }
 
@@ -68,14 +115,32 @@ pub fn run_app<B: Backend>(
                         KeyCode::Char('q') => return Ok(()),
                         KeyCode::Down => interface.manager.next_item(),
                         KeyCode::Up => interface.manager.previous_item(),
+                        KeyCode::Left => interface.previous_command(),
+                        KeyCode::Right => interface.next_command(),
                         KeyCode::Char('u') => interface.manager.update_setups(),
                         //KeyCode::Char('p') => interface.show_popup = !interface.show_popup,
-                        KeyCode::Enter => {
-                            event_listener_sender.send(EventListenerState::Sleeping).unwrap();
-                            interface.execute_current_setup();
-                            event_listener_sender.send(EventListenerState::Listening).unwrap();
-                            interface.show_popup = true;
-                        }
+                        KeyCode::Enter => match SelectedCommand::new(interface.index) {
+                            SelectedCommand::Install => {
+                                event_listener_sender
+                                    .send(EventListenerState::Sleeping)
+                                    .unwrap();
+                                interface.execute_current_setup();
+                                event_listener_sender
+                                    .send(EventListenerState::Listening)
+                                    .unwrap();
+                                interface.show_popup = true;
+                            }
+                            SelectedCommand::Show => {
+                                event_listener_sender
+                                    .send(EventListenerState::Sleeping)
+                                    .unwrap();
+                                interface.print_current_setup_string();
+                                event_listener_sender
+                                    .send(EventListenerState::Listening)
+                                    .unwrap();
+                                interface.show_popup = true;
+                            }
+                        },
                         _ => {}
                     },
                     _ => (),
@@ -144,12 +209,13 @@ fn ui<B: Backend>(f: &mut Frame<B>, interface: &mut UserInterface) {
             Style::default()
                 .add_modifier(Modifier::BOLD)
                 .fg(Color::Cyan),
-        ).highlight_symbol(">> ");
+        )
+        .highlight_symbol(">> ");
     f.render_stateful_widget(setups_list, chunks[1], &mut interface.manager.state);
     if interface.show_popup {
-        let block = Block::default().title("Status").borders(Borders::ALL);
+        let block = Block::default().title(interface.popup_title.clone()).borders(Borders::ALL);
         let paragraph = Paragraph::new(interface.popup_text.clone()).block(block);
-        let area = centered_rect(60, 20, size);
+        let area = centered_rect(80, 80, size);
 
         f.render_widget(Clear, area); //this clears out the background
         f.render_widget(paragraph, area);
