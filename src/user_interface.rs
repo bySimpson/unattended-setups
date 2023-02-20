@@ -146,7 +146,12 @@ pub fn run_app<B: Backend>(
                     _ => (),
                 }
             } else {
-                interface.show_popup = false;
+                match event {
+                    Event::Key(_) => {
+                        interface.show_popup = false;
+                    },
+                    _ => {}
+                }
             }
         }
     }
