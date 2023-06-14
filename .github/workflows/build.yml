@@ -85,12 +85,12 @@ jobs:
       name: download artifacts
     - name: Display artifacts
       run: ls -R
-    - uses: marvinpinto/action-automatic-releases@latest
+    - uses: softprops/action-gh-release@v1
       name: publish prerelease
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        automatic_release_tag: "${{ github.head_ref || github.ref_name }}"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag_name: "${{ github.head_ref || github.ref_name }}"
         prerelease: true
-        title: "Development build: ${{ github.head_ref || github.ref_name }}"
+        name: "Development build: ${{ github.head_ref || github.ref_name }}"
         files: |
           ./*/*.tar.gz
