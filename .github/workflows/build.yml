@@ -85,7 +85,7 @@ jobs:
       name: download artifacts
     - name: Display artifacts
       run: ls -R
-    - uses: softprops/action-gh-release@v1
+    - uses: softprops/action-gh-release@v2
       name: publish prerelease
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
