@@ -19,5 +19,6 @@ sh -c "$(curl -fsSL https://thmr.at/cli/{BRANCH/RELEASE})"
 | Docker  | sh -c "$(curl -fsSL https://thmr.at/setup/docker)"            |
 | dust    | sh -c "$(curl -fsSL https://thmr.at/setup/dust)"              |
 | glow    | sh -c "$(curl -fsSL https://thmr.at/setup/glow)"              |
+| netbird | sh -c "$(curl -fsSL https://thmr.at/setup/netbird)"           |
 | ripgrep | sh -c "$(curl -fsSL https://thmr.at/setup/ripgrep)"           |
 | ZSH     | sh -c "$(curl -fsSL https://thmr.at/setup/zsh)"               |
