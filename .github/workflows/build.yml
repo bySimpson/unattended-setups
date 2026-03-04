@@ -81,7 +81,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v7
+    - uses: actions/download-artifact@v8
       name: download artifacts
     - name: Display artifacts
       run: ls -R
