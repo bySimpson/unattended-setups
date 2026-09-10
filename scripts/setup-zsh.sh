@@ -5,4 +5,9 @@ cd ~/.oh-my-zsh/custom/plugins && git clone https://github.com/zsh-users/zsh-syn
 sed -i "s/ZSH_THEME=.*/ZSH_THEME=\"risto\"/g" ~/.zshrc
 sed -i "s/plugins=.*/plugins=(git sudo zsh-syntax-highlighting git dirhistory extract web-search yum git-extras docker vagrant chucknorris)/g" ~/.zshrc
 sed -i '/unsetopt BEEP/d' ~/.zshrc && echo "unsetopt BEEP" >> ~/.zshrc
+
+# starship setup
+curl -sS https://starship.rs/install.sh | sh -s -- -y
+echo "eval "$(starship init zsh)"" >> ~/.zshrc
+
 exec /bin/zsh
