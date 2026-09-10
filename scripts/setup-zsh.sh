@@ -7,7 +7,7 @@ sed -i "s/plugins=.*/plugins=(git sudo zsh-syntax-highlighting git dirhistory ex
 sed -i '/unsetopt BEEP/d' ~/.zshrc && echo "unsetopt BEEP" >> ~/.zshrc
 
 # starship setup
-curl -sS https://starship.rs/install.sh | sh -s -- -y
+curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 echo "eval "$(starship init zsh)"" >> ~/.zshrc
 
 exec /bin/zsh
