@@ -6,8 +6,22 @@ sed -i "s/ZSH_THEME=.*/ZSH_THEME=\"risto\"/g" ~/.zshrc
 sed -i "s/plugins=.*/plugins=(git sudo zsh-syntax-highlighting git dirhistory extract web-search yum git-extras docker vagrant chucknorris)/g" ~/.zshrc
 sed -i '/unsetopt BEEP/d' ~/.zshrc && echo "unsetopt BEEP" >> ~/.zshrc
 
-# starship setup
-curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
-echo "eval "$(starship init zsh)"" >> ~/.zshrc
+curl -sS https://starship.rs/install.sh | sh -s -- -y
 
-exec /bin/zsh
+# Determine the correct .zshrc path
+ZSHRC="${ZDOTDIR:-$HOME}/.zshrc"
+
+# Ensure .zshrc exists
+touch "$ZSHRC"
+
+# Add starship init line if not already present
+INIT_LINE='eval "$(starship init zsh)"'
+
+if ! grep -qF "$INIT_LINE" "$ZSHRC"; then
+    echo "" >> "$ZSHRC"
+    echo "# Initialize Starship prompt" >> "$ZSHRC"
+    echo "$INIT_LINE" >> "$ZSHRC"
+    echo "Added Starship init to $ZSHRC"
+else
+    echo "Starship init already present in $ZSHRC"
+fi
